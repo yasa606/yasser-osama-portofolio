@@ -1,0 +1,6 @@
+# Allow all crawlers to access everything
+User-agent: *
+Allow: /
+
+# Point to your sitemap to help Google index your site faster
+Sitemap: https://yasserportofolio.netlify.app/sitemap-v2.xml
