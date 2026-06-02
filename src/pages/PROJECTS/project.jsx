@@ -31,9 +31,9 @@ const Projects = () => {
   return (
     <section id="projects" className="min-h-screen py-24 px-6 bg-[#050505]">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-center text-5xl md:text-6xl font-bold text-white mb-16">
+        <h2 className="text-center text-5xl md:text-6xl font-bold text-white mb-16">
           <span className="text-cyan-400">PROJECTS</span>
-        </h1>
+        </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           {projects.map((project, index) => (
@@ -50,9 +50,9 @@ const Projects = () => {
               </div>
 
               <div className="p-6 flex flex-col h-[300px]">
-                <h2 className="text-xl font-bold text-white mb-3 min-h-[60px]">
+                <h3 className="text-xl font-bold text-white mb-3 min-h-[60px]">
                   {project.title}
-                </h2>
+                </h3>
                 <p className="text-gray-400 leading-relaxed flex-grow">
                   {project.description}
                 </p>
@@ -60,6 +60,8 @@ const Projects = () => {
                   href={project.link}
                   target="_blank"
                   rel="noopener noreferrer"
+                  // Added aria-label to make each link unique for screen readers
+                  aria-label={`View the ${project.title} project`}
                   className="mt-6 px-5 py-3 rounded-full bg-cyan-400 text-black font-semibold text-center hover:scale-105 transition"
                 >
                   View Project
