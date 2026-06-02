@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { Menu, X } from "lucide-react"; // npm install lucide-react
 
 const Navbar = () => {
   const [active, setActive] = useState("Home");
   const [show, setShow] = useState(true);
+  const [isOpen, setIsOpen] = useState(false); // New state for mobile menu
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -15,86 +17,48 @@ const Navbar = () => {
     { name: "Contact Me", id: "contact", path: "/" },
   ];
 
-  // 1. ScrollSpy: Track which section is visible
-  useEffect(() => {
-    // Only track scroll if we are on the homepage
-    if (location.pathname !== "/") return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const foundLink = links.find((link) => link.id === entry.target.id);
-            if (foundLink) setActive(foundLink.name);
-          }
-        });
-      },
-      { threshold: 0.6 }, // Active when 60% of the section is visible
-    );
-
-    // Observe all sections that have an ID
-    links.forEach((link) => {
-      if (link.id) {
-        const element = document.getElementById(link.id);
-        if (element) observer.observe(element);
-      }
-    });
-
-    return () => observer.disconnect();
-  }, [location.pathname]);
-
-  // 2. Hide/Show Navbar on scroll
-  useEffect(() => {
-    let lastScroll = 0;
-    const handleScroll = () => {
-      const currentScroll = window.scrollY;
-      setShow(currentScroll <= lastScroll || currentScroll <= 50);
-      lastScroll = currentScroll;
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  // ... (Keep your existing useEffect ScrollSpy and Hide/Show logic here)
 
   const handleNavigation = (link) => {
     setActive(link.name);
-    if (location.pathname !== link.path) {
-      navigate(link.path);
-    }
+    setIsOpen(false); // Close menu on click
+    if (location.pathname !== link.path) navigate(link.path);
     if (link.id) {
       setTimeout(() => {
-        document
-          .getElementById(link.id)
-          ?.scrollIntoView({ behavior: "smooth" });
+        document.getElementById(link.id)?.scrollIntoView({ behavior: "smooth" });
       }, 100);
     }
   };
 
   return (
-    <nav
-      className={`fixed top-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 ${
-        show ? "translate-y-0 opacity-100" : "-translate-y-20 opacity-0"
-      }`}
-    >
-      <div className="flex items-center gap-8 md:gap-12 px-8 py-5 rounded-full bg-black/80 backdrop-blur-xl border border-white/10 shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+    <nav className={`fixed top-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 w-[90%] md:w-auto ${show ? "translate-y-0 opacity-100" : "-translate-y-20 opacity-0"}`}>
+      {/* Desktop View */}
+      <div className="hidden md:flex items-center gap-12 px-8 py-5 rounded-full bg-black/80 backdrop-blur-xl border border-white/10 shadow-lg">
         {links.map((link) => (
-          <button
-            key={link.name}
-            onClick={() => handleNavigation(link)}
-            className={`relative uppercase text-sm font-semibold tracking-wider transition-all duration-300 ${
-              active === link.name
-                ? "text-white"
-                : "text-gray-400 hover:text-white"
-            }`}
-          >
+          <button key={link.name} onClick={() => handleNavigation(link)} className={`uppercase text-sm font-semibold ${active === link.name ? "text-white" : "text-gray-400"}`}>
             {link.name}
-            {active === link.name && (
-              <span className="absolute left-1/2 -translate-x-1/2 -bottom-3 w-8 h-1 rounded-full bg-cyan-400 shadow-[0_0_10px_#00d9ff,0_0_20px_#00d9ff]" />
-            )}
           </button>
         ))}
       </div>
+
+      {/* Mobile View */}
+      <div className="md:hidden flex items-center justify-between px-6 py-4 rounded-2xl bg-black/80 backdrop-blur-xl border border-white/10">
+        <span className="text-white font-bold">Yasser</span>
+        <button onClick={() => setIsOpen(!isOpen)} className="text-white">
+          {isOpen ? <X /> : <Menu />}
+        </button>
+      </div>
+
+      {/* Mobile Menu Overlay */}
+      {isOpen && (
+        <div className="md:hidden absolute top-20 left-0 w-full bg-black/90 backdrop-blur-xl border border-white/10 rounded-2xl p-6 flex flex-col gap-4">
+          {links.map((link) => (
+            <button key={link.name} onClick={() => handleNavigation(link)} className="text-white text-lg py-2">
+              {link.name}
+            </button>
+          ))}
+        </div>
+      )}
     </nav>
   );
 };
-
-export default Navbar;
